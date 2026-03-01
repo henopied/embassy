@@ -82,8 +82,8 @@ impl<'d> Flash<'d> {
     }
 
     // TODO: link section correctly
-    #[unsafe(link_section = ".data")]
-    #[inline(never)]
+    #[cfg_attr(feature="flash-ram", unsafe(link_section = ".data"), inline(never))]
+    #[cfg_attr(not(feature="flash-ram"), inline(always))]
     fn do_cmd_inner(&mut self) -> Result<(), Error> {
         regs().cmdexec().write(|w| w.set_val(true));
 

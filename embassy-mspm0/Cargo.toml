@@ -84,6 +84,8 @@ mspm0-metapac = { git = "https://github.com/mspm0-rs/mspm0-data-generated/", tag
 [features]
 default = ["rt"]
 
+flash-ram = []
+
 ## Enable `mspm0-metapac`'s `rt` feature
 rt = ["mspm0-metapac/rt"]
 
