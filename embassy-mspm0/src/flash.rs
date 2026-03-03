@@ -28,7 +28,7 @@ impl<'d> Flash<'d> {
     }
 
     fn write_word(&mut self, offset: u32, word: &[u8]) -> Result<(), Error> {
-        self.clr_stat()?;
+        self.clr_stat();
         regs().cmdtype().write(|w| {
             w.set_command(vals::Command::PROGRAM);
             w.set_size(vals::Size::ONEWORD);
@@ -56,7 +56,7 @@ impl<'d> Flash<'d> {
     }
 
     fn erase_sector(&mut self, offset: u32) -> Result<(), Error> {
-        self.clr_stat()?;
+        self.clr_stat();
         regs().cmdtype().write(|w| {
             w.set_command(vals::Command::ERASE);
             w.set_size(vals::Size::SECTOR);
@@ -70,11 +70,11 @@ impl<'d> Flash<'d> {
         self.do_cmd()
     }
 
-    fn clr_stat(&mut self) -> Result<(), Error> {
+    fn clr_stat(&mut self) {
         regs()
             .cmdtype()
             .write(|w| w.set_command(vals::Command::CLEARSTATUS));
-        self.do_cmd_inner()
+        while regs().statcmd().read().inprogress() {}
     }
 
     fn do_cmd(&mut self) -> Result<(), Error> {
@@ -89,7 +89,7 @@ impl<'d> Flash<'d> {
 
         let ret = loop {
             let stat = regs().statcmd().read();
-            if stat.inprogress() {
+            if !stat.done() {
                 continue;
             }
 
